@@ -1,11 +1,32 @@
 import React, { useState } from 'react'
+import { useAppContext } from '../../context/AppContext.jsx'
+import toast from 'react-hot-toast';
 
 const Login = () => {
+  const {axios,setToken} = useAppContext();
   const [email,setEmail] = useState('')
   const [password,setPassword] = useState('')
-  const handleSubmit = async(e)=>{
-    e.preventDefault()
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const { data } = await axios.post('/api/admin/login', { email, password });
+
+    if (data.success) {
+      setToken(data.token);
+      localStorage.setItem('token', data.token);
+      axios.defaults.headers.common['Authorization'] = data.token;
+      toast.success("Login successful!");
+    } else {
+      toast.error(data.message); // handles unexpected "success: false"
+    }
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.message) {
+      toast.error(error.response.data.message); // ✅ shows "Invalid credentials"
+    } else {
+      toast.error("Login failed. Please try again.");
+    }
   }
+};
   return (
     <div className='flex items-center justify-center h-screen'>
         <div className='w-full max-w-sm p-6 max-md:m-6 border border-primary/30 
