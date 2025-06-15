@@ -3,12 +3,14 @@ import { assets, blogCategories } from '../../assets/assets'
 import Quill from 'quill' 
 import { useAppContext } from '../../context/AppContext.jsx'
 import { toast } from 'react-hot-toast';
+import {parse} from 'marked'
 
 
 
 const AddBlog = () => {
   const {axios} = useAppContext()
   const[isAdding,setIsAdding] = useState(false)
+  const[loading,setLoading] = useState(false)
   const editorRef = useRef(null)
   const quillRef = useRef(null)
 
@@ -17,9 +19,22 @@ const AddBlog = () => {
   const [subtitle,setSubTitle]=useState('');
   const [category,setCategory]=useState('Startup');
   const [isPublished,setIsPublished]=useState(false);
-
+// Generate AI functionality
   const generateContent = async()=>{
-
+    if(!title) return toast.error('Please enter a title')
+      try {
+        setLoading(true);
+        const {data} = await axios.post('/api/blog/generate',{prompt: title})
+        if(data.success){
+          quillRef.current.root.innerHTML = parse(data.content)
+        }else{
+          toast.error(data.message)
+        }
+      } catch (error) {
+         toast.error(error.message)
+      }finally{
+        setLoading(false)
+      }
   }
 
   const onSubmitHandler = async(e)=>{
@@ -93,7 +108,7 @@ onChange={e=>setSubTitle(e.target.value) } value={subtitle}/>
 
 <div ref={editorRef}></div>
 
-  <button type='button' onClick={generateContent} 
+  <button disabled={loading} type='button' onClick={generateContent} 
   className='absolute bottom-1 right-2 ml-2 text-xs text-white bg-black/70 px-4 py-1.5
   rounded hover:outline cursor-pointer'>Generate with AI</button>
 

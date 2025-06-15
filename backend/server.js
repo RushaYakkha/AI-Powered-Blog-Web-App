@@ -1,5 +1,5 @@
-import express from 'express'
 import 'dotenv/config'
+import express from 'express'
 import cors from 'cors'
 import connectDB from './configs/db.js';
 import adminRouter from './routes/adminRoutes.js';
@@ -25,4 +25,8 @@ app.listen(PORT,()=>{
     console.log('Server is running in PORT ' + PORT);
     
 })
+
+
+
 export default app;
+
