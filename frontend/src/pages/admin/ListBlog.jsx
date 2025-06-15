@@ -1,12 +1,32 @@
 import React, { useEffect, useState } from 'react'
 import { assets, blog_data } from '../../assets/assets';
 import BlogTableItem from '../../components/admin/BlogTableItem';
+import { useAppContext } from '../../context/AppContext';
+import toast from 'react-hot-toast';
 
 const ListBlog = () => {
   const [blogs,setBlogs]=useState([]);
-  const fetchBlogs = async()=>{
-    setBlogs(blog_data)
+  const {axios} = useAppContext()
+  const fetchBlogs = async () => {
+  try {
+    const { data } = await axios.get('/api/admin/blogs');
+    console.log("API response:", data);
+    if (data.success) {
+      if (Array.isArray(data.blog)) {
+        setBlogs(data.blog); 
+      } else {
+        toast.error("Blog data is not an array");
+        setBlogs([]);
+      }
+    } else {
+      toast.error(data.message);
+    }
+  } catch (error) {
+    toast.error(error.message);
   }
+};
+
+
   useEffect(()=>{
     fetchBlogs()
   },[])
