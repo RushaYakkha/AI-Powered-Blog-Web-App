@@ -58,7 +58,7 @@ export const getAllComments = async(req,res)=>{
 // Admin get all the Dashboard datas
 export const getDashboard = async(req,res)=>{
     try {
-        const recentBlogs = await Blog.find({}).sort({creatdAt:-1}).limit(5);
+        const recentBlogs = await Blog.find({}).sort({creatdAt:-1}).limit(10);
         const blogs = await Blog.countDocuments();
         const comments = await Comment.countDocuments();
         const drafts = await Blog.countDocuments({isPublished:false})
