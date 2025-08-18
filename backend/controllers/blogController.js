@@ -56,7 +56,7 @@ res.json({
 
 export const getAllBlogs = async(req,res)=>{
     try {
-        const blogs = await Blog.find({isPublished:true})
+        const blogs = await Blog.find({isPublished:true}) //database filtering
         res.json({
           blogs,
             success:true
@@ -68,6 +68,37 @@ export const getAllBlogs = async(req,res)=>{
         })
     }
 }
+
+
+
+//adding content-based filter
+import { getSimilarBlogs } from "../services/contentBasedFilter.js";
+export const getRecommendations = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ message: "Blog ID is required" });
+
+    const targetBlog = await Blog.findById(id);
+    if (!targetBlog) return res.status(404).json({ message: "Blog not found" });
+
+    // Ensure description exists for all blogs
+    const allBlogs = await Blog.find({});
+    allBlogs.forEach(blog => {
+      if (!blog.description) blog.description = ""; // <- add this
+    });
+
+    if (!targetBlog.description) targetBlog.description = "";
+
+    const recommended = getSimilarBlogs(allBlogs, targetBlog, 5);
+
+    res.json({ success: true, recommended });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
     export const getBlogById = async(req,res)=>{
         try {
             const {blogId} = req.params;
@@ -91,7 +122,7 @@ export const getAllBlogs = async(req,res)=>{
     }
 
 // function to delete any blog
-      export const deleteBlogById = async(req,res)=>{
+      export const deleteBlogById = async(req,res)=>{//cascade delete
         try {
             const {id} = req.body;
             await Blog.findByIdAndDelete(id);
@@ -119,7 +150,7 @@ export const getAllBlogs = async(req,res)=>{
         try {
             const {id} = req.body;
             const blog = await Blog.findById(id);
-            blog.isPublished = !blog.isPublished;
+            blog.isPublished = !blog.isPublished;//boolean toggeling
             await blog.save();
              res.json({
           message : "Blog status updated successfully",
@@ -155,7 +186,7 @@ export const getAllBlogs = async(req,res)=>{
     export const getBlogComments = async(req,res)=>{
         try {
             const {blogId} = req.body;
-            const comments = await Comment.find({blog:blogId, isApproved:true}).sort({createdAt:-1});
+            const comments = await Comment.find({blog:blogId, isApproved:true}).sort({createdAt:-1});//sorting algorithm
              res.json({
             comments,
             success:true
@@ -172,7 +203,7 @@ export const getAllBlogs = async(req,res)=>{
 
 
 // generate content
-export const generateContent = async(req,res)=>{
+export const generateContent = async(req,res)=>{//generative AI algorithm
     try {
         const{prompt}=req.body;
         const content = await main(prompt + 'Generate a blog content for this topic in simple text format')

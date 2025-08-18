@@ -7,6 +7,8 @@ import Footer from '../components/Footer';
 import Loader from '../components/Loader';
 import { useAppContext } from '../context/AppContext';
 import toast from "react-hot-toast";
+import Recommendations from '../components/Recommendations';
+
 
 
 const Blog = () => {
@@ -82,6 +84,11 @@ const Blog = () => {
   <div
   className='rich-text max-w-3xl mx-auto'
   dangerouslySetInnerHTML={{__html:data.description }}></div>
+
+  {/* Recommended Blogs Section */}
+<div className="my-16 max-w-5xl mx-auto">
+  <Recommendations blogId={data._id} />
+</div>
 
   {/* Adding comments */}
   <div className='mt-14 mb-10 max-w-3xl mx-auto'>
