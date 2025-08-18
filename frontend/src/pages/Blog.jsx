@@ -19,6 +19,22 @@ const Blog = () => {
   const [name, setName] = useState('')
   const [content, setContent] = useState('')
 
+//for search 
+const [searchQuery, setSearchQuery] = useState("");
+const [searchResults, setSearchResults] = useState([]);
+
+const handleSearch = async () => {
+  try {
+    const { data } = await axios.post("/api/blog/search", { query: searchQuery });
+    if (data.success) setSearchResults(data.blogs);
+  } catch (error) {
+    toast.error(error.message);
+  }
+};
+
+
+
+
   const fetchBlogData = async ()=>{
     try {
       const {data} = await axios.get(`/api/blog/${id}`)
@@ -89,6 +105,11 @@ const Blog = () => {
 <div className="my-16 max-w-5xl mx-auto">
   <Recommendations blogId={data._id} />
 </div>
+
+
+
+
+
 
   {/* Adding comments */}
   <div className='mt-14 mb-10 max-w-3xl mx-auto'>

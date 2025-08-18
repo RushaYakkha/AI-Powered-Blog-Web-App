@@ -5,11 +5,6 @@ import { useAppContext } from '../context/AppContext'
 const Header = () => {
   const { setInput, input } = useAppContext();
 
-  const onSubmitHandler = (e) => {
-    e.preventDefault();
-    // No need to setInput again since it's already controlled by input box
-  }
-
   return (
     <div className='mx-8 sm:mx-16 xl:mx-24 relative'>
       <div className='text-center mt-20 mb-8'>
@@ -30,35 +25,18 @@ const Header = () => {
           At Blogance, we believe everyone has a story worth sharing. Whether you're here to inspire, inform, or simply express — this is your creative home.
         </p>
 
-        {/* Search bar */}
-        <form onSubmit={onSubmitHandler} className='flex justify-between max-w-lg max-sm:scale-75 mx-auto border border-gray-300 bg-white rounded overflow-hidden'>
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            type="text"
-            placeholder="search for blogs"
-            required
-            className='w-full pl-4 outline-none'
-          />
-          <button
-            type="submit"
-            className='bg-primary text-white px-8 py-2 m-1.5 rounded hover:scale-105 transition-all cursor-pointer'
-          >
-            Search
-          </button>
-        </form>
-      </div>
-
-      {/* Clear Search Button */}
-      <div className='text-center'>
+        {/* Clear Search Button */}
         {input && (
-          <button
-            onClick={() => setInput('')}
-            className='border font-light text-xs py-1 px-3 rounded-sm shadow-custom-sm cursor-pointer mt-2'
-          >
-            Clear Search
-          </button>
+          <div className='text-center'>
+            <button
+              onClick={() => setInput('')}
+              className='border font-light text-xs py-1 px-3 rounded-sm shadow-custom-sm cursor-pointer mt-2'
+            >
+              Clear Search
+            </button>
+          </div>
         )}
+
       </div>
 
       {/* Background Image */}
@@ -67,4 +45,4 @@ const Header = () => {
   )
 }
 
-export default Header;
+export default Header

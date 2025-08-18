@@ -213,3 +213,24 @@ export const generateContent = async(req,res)=>{//generative AI algorithm
          res.json({success:false,message: error.message})
     }
 }
+
+
+
+
+//Create Search Controller Function
+export const searchBlogs = async (req, res) => {
+    try {
+      const { query } = req.query;
+        if (!query) return res.status(400).json({ success: false, message: "Search query is required" });
+
+        // Search blogs using MongoDB full-text search
+        const blogs = await Blog.find(
+            { $text: { $search: query }, isPublished: true },
+            { score: { $meta: "textScore" } } // get relevance score
+        ).sort({ score: { $meta: "textScore" } }); // sort by relevance
+
+        res.json({ success: true, blogs });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};

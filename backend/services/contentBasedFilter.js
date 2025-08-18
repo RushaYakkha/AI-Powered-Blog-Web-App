@@ -1,13 +1,20 @@
-import natural from "natural";
-const TfIdf = natural.TfIdf;
-const tokenizer = new natural.WordTokenizer();
+
+// // //Content-Based Filtering based on title,category,subtitile(Convert each blog's text into a TF-IDF vector.
+
+// // Compute the similarity between the target blog and all other blogs (usually cosine similarity).
+
+// Recommend blogs with the highest similarity scores.)
+import natural from 'natural';
+
+const { TfIdf, WordTokenizer } = natural;
+const tokenizer = new WordTokenizer();
 
 function cosineSimilarity(vecA, vecB) {
   let dotProduct = 0.0, normA = 0.0, normB = 0.0;
   for (let i = 0; i < vecA.length; i++) {
-    dotProduct += vecA[i] * vecB[i];
-    normA += vecA[i] * vecA[i];
-    normB += vecB[i] * vecB[i];
+      dotProduct += vecA[i] * vecB[i];
+      normA += vecA[i] * vecA[i];
+      normB += vecB[i] * vecB[i];
   }
   if (normA === 0 || normB === 0) return 0;
   return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
@@ -19,30 +26,28 @@ export function getSimilarBlogs(allBlogs = [], targetBlog = {}, limit = 5) {
   const tfidf = new TfIdf();
 
   allBlogs.forEach(blog => {
-    const text = (blog?.description || "").toString();
-    tfidf.addDocument(tokenizer.tokenize(text).join(" "));
+      const text = (blog?.description || "").toString();
+      tfidf.addDocument(tokenizer.tokenize(text).join(" "));
   });
 
-  const targetText = (targetBlog?.description || "").toString();
   const targetIndex = allBlogs.findIndex(blog => blog._id.toString() === targetBlog._id.toString());
-
-  if (targetIndex === -1) return []; // targetBlog not found in allBlogs
+  if (targetIndex === -1) return [];
 
   const similarities = [];
 
   allBlogs.forEach((blog, index) => {
-    if (!blog || index === targetIndex) return;
+      if (!blog || index === targetIndex) return;
 
-    const vectorA = [];
-    const vectorB = [];
+      const vectorA = [];
+      const vectorB = [];
 
-    tfidf.listTerms(index).forEach(item => {
-      vectorA.push(item.tfidf);
-      vectorB.push(tfidf.tfidf(item.term, targetIndex) || 0);
-    });
+      tfidf.listTerms(index).forEach(item => {
+          vectorA.push(item.tfidf);
+          vectorB.push(tfidf.tfidf(item.term, targetIndex) || 0);
+      });
 
-    const score = cosineSimilarity(vectorA, vectorB);
-    similarities.push({ blog, score });
+      const score = cosineSimilarity(vectorA, vectorB);
+      similarities.push({ blog, score });
   });
 
   similarities.sort((a, b) => b.score - a.score);
